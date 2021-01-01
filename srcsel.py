@@ -6,11 +6,14 @@ import time
 import RPi.GPIO as GPIO
 
 
-# The file path for `ddcci-tool`
-DDCCI_TOOL = "/usr/local/bin/ddcci-tool"
+# The file path for `ddcutil`
+DDCUTIL = "/usr/local/bin/ddcutil"
 
-# The device file used for DDC/CI
-I2C_DEV_FILE = "/dev/i2c-1"
+# The I2C bus number for `ddcutil`
+I2C_BUS = 1
+
+# The MCCS version for `ddcutil`
+MCCS_VER = "2.2"
 
 # The GPIO pin identifiers assigned to each switch.
 # The index of this list corresponds to the identifier of each switch.
@@ -59,8 +62,8 @@ def change_source(switch):
     """
     Change the input source of the monitor.
 
-    This function depends on ddcci-tool.
-    https://github.com/bhuvanchandra/ddcci
+    This function depends on ddcutil.
+    https://github.com/rockowitz/ddcutil
 
     Parameters
     ----------
@@ -71,12 +74,14 @@ def change_source(switch):
     """
     subprocess.run(
         [
-            DDCCI_TOOL,
-            "-r",
+            DDCUTIL,
+            "--bus",
+            str(I2C_BUS),
+            "--mccs",
+            MCCS_VER,
+            "setvcp",
             "0x60",  # VCP Code for "Input Select"
-            "-w",
             str(SOURCES[switch]),
-            I2C_DEV_FILE,
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
